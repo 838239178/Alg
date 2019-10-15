@@ -1,7 +1,7 @@
-﻿
+﻿															
 #include <stdio.h>
 #include <stdlib.h>
-
+//存在问题
 #define ERROR NULL
 	typedef int ElementType;
 	typedef struct LNode* PtrToLNode;
