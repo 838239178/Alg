@@ -1,1 +1,30 @@
+#include <iostream>
+#include <algorithm>
+#include <cstring>
+#include <math.h>
+using namespace std;
+int countprime(int);
+int main()
+{
+	int n;
+	cin >> n;
 
+	cout << countprime(n);
+}
+int countprime(int n)
+{
+	int* prime = new int [n];
+	//prime = (int*)malloc(sizeof(int) * n);
+	for (int i = 0; i < n; i++) prime[i] = 1;
+	for (int i = 2; i*i < n; i++)                                 //排除素数的倍数
+		if (prime[i])
+			for (int j = i * i; j <= n; j += i) {
+				prime[j] = 0;
+				//cout << j << endl;
+			}
+	int count = 1;
+	for (int i = 2; i <= n; i++)
+		if (prime[i]) count++;
+	//free(prime);
+	return count;
+}
