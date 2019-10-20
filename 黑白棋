@@ -1,0 +1,344 @@
+#include <vector> 
+#include <iostream> 
+using namespace std; 
+
+int x, y;
+char area[8][8];
+char player;
+int areachange[8][8];
+int n_x, n_y;
+int judge;
+
+void resetareachange();
+void change();
+
+int search_up(int ju) 
+{
+	if (ju == 0) {
+		int j = x;
+		for (int i = y; i >= 0; i--) {
+			if (area[i][j] == player) {
+				if (judge == 0)
+					printf(" (%d,%d)", y + 1, x + 1);
+				else
+					printf("(%d,%d)", y + 1, x + 1);
+				return 1;
+			}
+
+		}
+	}else {
+		int j = n_x;
+		for (int i = n_y-1; i >= 0; i--) {
+			if (area[i][j] != player && area[i][j] != '-') {
+				areachange[i][j] = 1;
+			}
+			else if(area[i][j] == player){
+				change();
+				return 1;
+			}
+		}
+		resetareachange();
+	}
+	
+	return 0;
+}
+int search_down(int ju)
+{
+	if (ju == 0) {
+		int j = x;
+		for (int i = y; i < 8; i++) {
+			if (area[i][j] == player) {
+				if (judge == 0)
+					printf(" (%d,%d)", y + 1, x + 1);
+				else
+					printf("(%d,%d)", y + 1, x + 1);
+				return 1;
+			}
+		}
+	}
+	else {
+		int j = n_x;
+		for (int i = n_y+1; i < 8; i++) {
+			if (area[i][j] != player && area[i][j] != '-') {
+				areachange[i][j] = 1;
+			}
+			else if (area[i][j] == player) {
+				change();
+				return 1;
+			}
+		}
+		resetareachange();
+	}
+	
+	return 0;
+}
+int search_right(int ju)
+{
+	if (ju == 0) {
+		int j = y;
+		for (int i = x; i < 8; i++) {
+			if (area[j][i] == player) {
+				if (judge == 0)
+					printf(" (%d,%d)", y + 1, x + 1);
+				else
+					printf("(%d,%d)", y + 1, x + 1);
+				return 1;
+			}
+		}
+	}
+	else {
+		int j = n_y;
+		for (int i = n_x+1; i < 8; i++) {
+			if (area[j][i] != player && area[j][i] != '-') {
+				areachange[j][j] = 1;
+			}
+			else if (area[j][i] == player) {
+				change();
+				return 1;
+			}
+		}	
+		resetareachange();
+	}
+
+	return 0;
+}
+int search_left(int ju)
+{
+	if (ju == 0) {
+		int j = y;
+		for (int i = x; i >= 0; i--) {
+			if (area[j][i] == player) {
+				if (judge == 0)
+					printf(" (%d,%d)", y + 1, x + 1);
+				else
+					printf("(%d,%d)", y + 1, x + 1);
+				return 1;
+			}
+		}
+	}
+	else {
+		int j = n_y;
+		for (int i = n_x-1; i >= 0; i--) {
+			if (area[j][i] != player && area[j][i] != '-') {
+				areachange[j][i] = 1;
+			}
+			else if (area[j][i] == player) {
+				change();
+				return 1;
+			}
+		}
+		resetareachange();
+	}
+	
+	return 0;
+}
+int search_rightup(int ju)
+{
+	if (ju == 0) {
+		for (int i = y, j = x; j < 8 && i >= 0; j++, i--) {
+			if (area[i][j] == player) {
+				if (judge == 0)
+					printf(" (%d,%d)", y + 1, x + 1);
+				else
+					printf("(%d,%d)", y + 1, x + 1);
+				return 1;
+			}
+		}
+	}
+	else {
+		for (int i = n_y-1, j = n_x+1; j < 8 && i >= 0; j++, i--) {
+			if (area[i][j] != player && area[i][j] != '-') {
+				areachange[i][j] = 1;
+			}
+			else if (area[i][j] == player) {
+				change();
+				return 1;
+			}
+		}
+		resetareachange();
+	}
+	
+	return 0;
+}
+int search_rightdown(int ju)
+{
+	if (ju == 0) {
+		for (int i = y, j = x; j < 8 && i < 8; j++, i++) {
+			if (area[i][j] == player) {
+				if (judge == 0)
+					printf(" (%d,%d)", y + 1, x + 1);
+				else
+					printf("(%d,%d)", y + 1, x + 1);
+				return 1;
+			}
+		}
+	}
+	else {
+		for (int i = n_y+1, j = n_x+1; j < 8 && i < 8; j++, i++) {
+			if (area[i][j] != player && area[i][j] != '-') {
+				areachange[i][j] = 1;
+			}
+			else if (area[i][j] == player) {
+				change();
+				return 1;
+			}
+		}
+		resetareachange();
+	}
+	
+	return 0;
+}
+int search_leftup(int ju)
+{
+	if (ju == 0) {
+		for (int i = y, j = x; j >= 0 && i >= 0; j--, i--) {
+			if (area[i][j] == player) {
+				if (judge == 0)
+					printf(" (%d,%d)", y + 1, x + 1);
+				else
+					printf("(%d,%d)", y + 1, x + 1);
+				return 1;
+			}
+		}
+	}
+	else {
+		for (int i = n_y-1, j = n_x-1; j >= 0 && i >= 0; j--, i--) {
+			if (area[i][j] != player && area[i][j] != '-') {
+				areachange[i][j] = 1;
+			}
+			else if (area[i][j] == player) {
+				change();
+				return 1;
+			}
+		}
+		resetareachange();
+	}
+	
+	return 0;
+}
+int search_leftdown(int ju)
+{
+	if (ju == 0) {
+		for (int i = y, j = x; j >= 0 && i < 8; j--, i++) {
+			if (area[i][j] == player) {
+				if (judge == 0)
+					printf(" (%d,%d)", y + 1, x + 1);
+				else
+					printf("(%d,%d)", y + 1, x + 1);
+				return 1;
+			}
+		}
+	}
+	else {
+		for (int i = n_y+1, j = n_x-1; j >= 0 && i < 8; j--, i++) {
+			if (area[i][j] != player && area[i][j] != '-') {
+				areachange[i][j] = 1;
+			}
+			else if (area[i][j] == player) {
+				change();
+				return 1;
+			}
+		}
+		resetareachange();
+	}
+	return 0;
+}
+void countBW(int* B, int* W)
+{
+	for(int i = 0;i<8;i++)
+		for (int j = 0; j < 8; j++) {
+			if (area[i][j] == 'B') (*B)++;
+			if (area[i][j] == 'W') (*W)++;
+		}
+}
+void change()
+{
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (areachange[i][j]) {
+				area[i][j] = player;
+			}
+		}
+	}
+}
+void resetareachange()
+{
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			areachange[i][j] = 0;
+		}
+	}
+}
+int main(int argc, char* argv[]) 
+{
+	for (y = 0; y < 8; y++)
+		 for (x = 0; x < 8; x++) {
+			 scanf(" %c", &area[y][x]);
+		}
+	scanf(" %c", &player);
+	char ch;
+	
+	while (1)
+	{			
+		int cntB = 0, cntW = 0;
+		cin >> ch;
+		if (ch == 'L') {
+			judge = 1;
+			for (y = 1; y < 8; y++)
+				for (x = 1; x < 8; x++) {
+					if (area[y][x] == '-') {
+						if (area[y - 1][x] != '-' && area[y - 1][x] != player) if (search_up(0)) { judge = 0; continue; }
+						if (area[y + 1][x] != '-' && area[y + 1][x] != player) if (search_down(0)) { judge = 0; continue; }
+						if (area[y][x - 1] != '-' && area[y][x - 1] != player) if (search_left(0)) { judge = 0; continue; }
+						if (area[y][x + 1] != '-' && area[y][x + 1] != player) if (search_right(0)) { judge = 0; continue; }
+						if (area[y - 1][x + 1] != '-' && area[y - 1][x + 1] != player) if (search_rightup(0)) { judge = 0; continue; }
+						if (area[y - 1][x - 1] != '-' && area[y - 1][x - 1] != player) if (search_leftup(0)) { judge = 0; continue; }
+						if (area[y + 1][x + 1] != '-' && area[y + 1][x + 1] != player) if (search_rightdown(0)) { judge = 0; continue; };
+						if (area[y + 1][x - 1] != '-' && area[y + 1][x + 1] != player) if (search_leftdown(0)) { judge = 0; continue; }
+					}
+				}
+			if (judge) {
+				printf("No legal move.");
+				if (player == 'W')
+					player = 'B';
+				else
+					player = 'W';
+			}
+			printf("\n");
+		}
+		else if (ch == 'M') {
+			resetareachange();
+			scanf("%1d", &n_y);
+			scanf("%1d", &n_x);
+			n_y--;
+			n_x--;
+			area[n_y][n_x] = player;
+			{
+				search_down(1);
+				search_up(1);
+				search_left(1);
+				search_right(1);
+				search_leftdown(1);
+				search_leftup(1);
+				search_rightdown(1);
+				search_rightup(1);
+			}
+			countBW(&cntB,&cntW);
+			printf("Balck - %2d White - %2d\n", cntB, cntW);
+			if (player == 'W')
+				player = 'B';
+			else
+				player = 'W';
+		}
+		else if (ch == 'Q') {
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					cout << area[i][j];
+				}
+				cout << endl;
+			}
+			exit(0);
+		}
+	}
+	
+}
