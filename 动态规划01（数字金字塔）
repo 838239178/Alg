@@ -1,0 +1,60 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+/*动态规划：用递推的方式寻找三角形路径最大和
+
+Input:
+4
+   7
+  5 6
+ 7 8 9
+4 6 4 3
+
+output : 27;
+
+给出 三角形的行数 n 和 三角形阵列；
+*/
+
+int a[100][100] = { 0 };
+int n;
+int maxdata[100][100];
+int msu(int i, int j)    //递归实现
+{
+	int res;
+	if (maxdata[i][j] != EOF)
+		return maxdata[i][j];
+	if (i == n) {
+		return a[i][j];
+	}
+	else {
+		res = max(msu(i + 1, j), msu(i + 1, j + 1))+a[i][j];
+		maxdata[i][j] = res;
+	}
+	return res;
+}
+
+int main()
+{
+	for (int i = 0; i < 100; i++)
+		for (int  j = 0; j < 100; j++)
+			maxdata[i][j] = -1;
+	cin >> n;
+	for (int  i = 1; i <= n; i++)
+		for (int  j = 1; j <= i; j++)
+			cin >> a[i][j];
+	cout << msu(1, 1) << endl;
+	//迭代实现
+	int* maxsum = a[n];
+	for (int i = n-1; i > 0; i--) {
+		for (int j = 1; j <= n; j++) {
+			maxsum[j] = max(maxsum[j], maxsum[j+1]) + a[i][j];
+		}
+		for (int z = 1; z <= n; z++)
+			cout << maxsum[z] << " ";
+		cout << endl;
+	}
+	cout << maxsum[1] << endl;
+	
+}
