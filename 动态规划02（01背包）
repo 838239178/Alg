@@ -1,0 +1,47 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int value[100];
+int weight[100];
+int maxdata[100][100];
+
+int bag(int i, int j)  //递归实现
+{
+	if (maxdata[i][j] != EOF)
+		return maxdata[i][j];
+	if (i == 0 || j == 0)
+		return 0;
+	if (weight[i] > j)
+		return bag(i-1,j);
+	else {
+		int res = max(bag(i - 1, j), bag(i - 1, j - weight[i]) + value[i]);
+		maxdata[i][j] = res;
+		return res;
+	}
+}
+int main()
+{
+	for (int i = 0; i < 100; i++)
+		for (int j = 0; j < 100; j++)
+			maxdata[i][j] = -1;
+	int n;
+	int totalweight;
+	cin >> n >> totalweight;
+	for (int  i = 1; i <= n; i++)
+		cin >> value[i] >> weight[i];
+	cout << "递归：" << bag(n, totalweight) << endl;
+	//递推（迭代） 滚动数组
+	int f[100] = { 0 };    //f[j]储存前一轮各个重量下最大价值
+	for (int i = 1; i <= n; i++) {       //枚举种类
+		for (int  j = totalweight; j >= 0; j--){   //算前n种的各个重量下最大价值
+			int next_w = j - weight[i];
+			if (next_w < 0) next_w = 0;   //防止下标越界
+			if (weight[i] > j)
+				f[j] = f[j];    //超重则最大价值等于前一轮的最大价值
+			else 
+				f[j] = max(f[j], f[next_w] + value[i]);
+		}
+	}
+	cout << "递推：" << f[totalweight] << endl;
+	return 0;
+}
