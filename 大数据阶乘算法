@@ -1,0 +1,38 @@
+#include <stdio.h>
+
+void Print_Factorial(const int N);
+
+int main()
+{
+	int N;
+
+	scanf("%d", &N);
+	Print_Factorial(N);
+	return 0;
+}
+/*
+模拟人工计算：
+      120
+	 X  2
+	-------
+	  240
+*/
+void Print_Factorial(const int N)
+{
+	int a[10000] = { 0 };
+	a[0] = 1;
+	int len = 1;
+	for (int i = 2; i <= N; i++) {
+		int temp = 0;
+		for (int j = 0; j < len; j++) {
+			int  s = a[j] * i + temp;     //当前位数×i 并且考虑前面的进位
+			a[j] = s%10;					//进位后 该位置的数
+			temp = s / 10;					// 进了多少
+			if (temp > 0 && j == len-1) len++;  //如果到最后一位仍然需要进位 就接着来一轮
+		}
+	}
+	for (int i = len - 1; i >= 0; i--) {   //因为进位要向空位置存放 因此数组里的数是逆序的 
+		printf("%d", a[i]);
+	}
+
+}
