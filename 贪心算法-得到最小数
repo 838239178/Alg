@@ -1,0 +1,37 @@
+/*
+移除K个数字(leetcode402)
+
+题目：已知一个使用字符串表示非负整数num，将num中的k个数字移除，求移除k个数字后，可以获得的最小的可能的新数字(num不会以0开头，num长度小于10002)
+
+例如：输入：num = “1432219”,k=3
+在去掉3个数字后得到的很多可能里，如1432，4322，2219，1219。。。。；去掉数字4、3、2、得到的1219最小
+*/
+#include <bits/stdc++.h>
+using namespace std;
+
+int main()
+{	
+	stack<char> n;
+	string s;
+	char ch;
+	int k;
+	cin >> s >> k;
+	for (int i = 0; i < s.length(); i++) {
+		if (n.empty() || s[i] >= n.top() || k==0) {
+			n.push(s[i]);
+		}
+		else {
+			n.pop();
+			k--;
+			n.push(s[i]);
+		}
+	}
+	s = "";
+	while (!n.empty()) {
+		s.push_back(n.top());
+		n.pop();
+	}
+	reverse(s.begin(), s.end());
+	cout << s;
+	return 0;
+}
