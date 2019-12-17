@@ -1,0 +1,42 @@
+/*KMP算法查找子串*/
+void MakeNext(int next[],char s[])
+{
+	int slen = str_len(s);
+	int j = 0, k = -1;
+	next[0] = -1;
+	while (j < slen)
+		if (k == -1 || s[j] == s[k])
+			next[++j] = ++k;
+		else
+			k = next[k];
+}
+int str_strKMP(char* s, char* p)
+{
+	int i = 0;
+	int j = 0;
+	int sLen = str_len(s);
+	int pLen = str_len(p);
+	int* next = new int[pLen];
+	MakeNext(next, p);
+	while (i < sLen && j < pLen)
+	{
+		//①如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++    
+		if (j == -1 || s[i] == p[j])
+		{
+			i++;
+			j++;
+		}
+		else
+		{
+			//②如果j != -1，且当前字符匹配失败（即S[i] != P[j]），则令 i 不变，j = next[j]    
+			//next[j]即为j所对应的next值      
+			j = next[j];
+		}
+	}
+	//delete[]next;
+	/*找到返回下标，找不到返回-1*/
+	if (j == pLen)
+		return i - j;
+	else
+		return -1;
+}
