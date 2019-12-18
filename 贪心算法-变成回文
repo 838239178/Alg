@@ -1,0 +1,52 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef string::iterator Sit;
+
+int Moveto(Sit x, Sit g)
+{
+	int cnt = 0;
+	while (x != g) {
+		swap(*x, *(x + 1));
+		x++;
+		cnt++;
+	}
+	return cnt;
+}
+/*
+贪心算法：从右到左，找到第一个相同的移动到对应位置
+找不到看字符串长度是奇数还是偶数，偶数impossible，奇数移动到中间
+*/
+int main()
+{
+	string s;
+	Sit i,j;
+	Sit end = s.end() - 1;
+	Sit begin = s.begin();
+	int count = 0;
+
+	cin >> s;
+	for (i = s.begin(); i < s.begin()+s.length()/2; i++) {
+		for (j = end; j >= begin; j--) {
+			if (*j == *i) {
+				if (j == i) {
+					if (s.length() % 2 == 0) {
+						cout << "Impossible" << endl;
+						return 0;
+					}
+					else {
+						Sit mid = begin + (end - begin) / 2;
+						count += Moveto(j, mid);
+					}
+				}
+				else
+					count += Moveto(j, end - (i - begin));
+				end--;
+				begin++;
+				break;
+			}
+		}
+	}
+	cout << count;
+	return 0;
+}
