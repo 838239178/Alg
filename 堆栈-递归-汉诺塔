@@ -1,0 +1,98 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+
+void hanota(char a, char b, char c, int n)
+{
+	if (n == 1)
+		cout << a << " -> " << c << endl;
+	else {
+		hanota(a, c, b, n - 1);
+		cout << a << " -> " << c << endl;
+		hanota(b, a, c, n - 1);
+	}
+}
+void hanota_stack(int n)
+{
+	string name = "pabc";
+	stack<int> a, b, c;
+	//先push一个比n大的数作为基础，以便接下来比较
+	a.push(n + 1); b.push(n + 1); c.push(n + 1);
+	for (int i = n; i > 0; i--) a.push(i);
+	//如果是奇数盘，则吧‘b'作为目标柱
+	if (n % 2 == 1) swap(name[2], name[3]);
+	for (int i = 1;; i++) {
+		switch (i % 3)
+		{
+		case 1:
+			//第一步移动
+			cout << name[1] << " -> " << name[2] << endl;
+			b.push(a.top());
+			a.pop();
+			//结束条件：目标柱满了
+			if (b.size() == n + 1 || c.size() == n + 1)
+				return;
+			//第二部移动
+			if (a.top() < c.top()) {
+				cout << name[1] << " -> " << name[3] << endl;
+				c.push(a.top());
+				a.pop();
+			}
+			else {
+				cout << name[3] << " -> " << name[1] << endl;
+				a.push(c.top());
+				c.pop();
+			}
+			break;
+		case 2:
+			cout << name[2] << " -> " << name[3] << endl;
+			c.push(b.top());
+			b.pop();
+			if (b.size() == n + 1 || c.size() == n + 1)
+				return;
+			if (b.top() < a.top()) {
+				cout << name[2] << " -> " << name[1] << endl;
+				a.push(b.top());
+				b.pop();
+			}
+			else {
+				cout << name[1] << " -> " << name[2] << endl;
+				b.push(a.top());
+				a.pop();
+			}
+			break;
+		case 0:
+			cout << name[3] << " -> " << name[1] << endl;
+			a.push(c.top());
+			c.pop();
+			if (b.size() == n + 1 || c.size() == n + 1)
+				return;
+			if (c.top() < b.top()) {
+				cout << name[3] << " -> " << name[2] << endl;
+				b.push(c.top());
+				c.pop();
+			}
+			else {
+				cout << name[2] << " -> " << name[3] << endl;
+				c.push(b.top());
+				b.pop();
+			}
+			break;
+		}
+	}
+}
+int main()
+{
+	int n;
+	cin >> n;
+	cout << "递归" << endl;
+	hanota('a', 'b', 'c', n);
+	cout << "堆栈" << endl;
+	hanota_stack(n);
+	return 0;
+}
