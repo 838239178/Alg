@@ -1,0 +1,39 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> sieve(int n); //函数声明,求n以内的质数
+
+int main(int argc, char const* argv[])
+{
+    int n;
+    cin >> n;
+
+    vector<int> ans = sieve(n);
+
+    cout << ans.size() << endl;
+    for (int i = 0; i < ans.size(); i++) {
+        cout << ans[i];
+        if (i < ans.size() - 1)cout << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+vector<int> sieve(int n)
+{
+    vector<int> prime(n+1, 1);
+    for (int i = 2; i * i < n; i++) {                                //排除素数的倍数
+        if (prime[i]) {
+            for (int j = i * i; j <= n; j += i) {
+                prime[j] = 0;
+            }
+        }
+    }
+    vector<int> res;
+    for (int i = 2; i < n; i++) {
+        if (prime[i])
+            res.push_back(i);
+    }
+    return res;
+}
