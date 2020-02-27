@@ -1,0 +1,189 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int ElementType;
+typedef struct TNode *Position;
+typedef Position BinTree;
+struct TNode{
+    ElementType Data;
+    BinTree Left;
+    BinTree Right;
+};
+
+void PreorderTraversal( BinTree BT ); /* 先序遍历，由裁判实现，细节不表 */
+void InorderTraversal( BinTree BT );  /* 中序遍历，由裁判实现，细节不表 */
+
+BinTree Insert( BinTree BST, ElementType X );
+BinTree Delete( BinTree BST, ElementType X );
+Position Find( BinTree BST, ElementType X );
+Position FindMin( BinTree BST );
+Position FindMax( BinTree BST );
+
+int main()
+{
+    BinTree BST, MinP, MaxP, Tmp;
+    ElementType X;
+    int N, i;
+
+    BST = NULL;
+    scanf("%d", &N);
+    for ( i=0; i<N; i++ ) {
+        scanf("%d", &X);
+        BST = Insert(BST, X);
+    }
+    printf("Preorder:"); PreorderTraversal(BST); printf("\n");
+    MinP = FindMin(BST);
+    MaxP = FindMax(BST);
+    scanf("%d", &N);
+    for( i=0; i<N; i++ ) {
+        scanf("%d", &X);
+        Tmp = Find(BST, X);
+        if (Tmp == NULL) printf("%d is not found\n", X);
+        else {
+            printf("%d is found\n", Tmp->Data);
+            if (Tmp==MinP) printf("%d is the smallest key\n", Tmp->Data);
+            if (Tmp==MaxP) printf("%d is the largest key\n", Tmp->Data);
+        }
+    }
+    scanf("%d", &N);
+    for( i=0; i<N; i++ ) {
+        scanf("%d", &X);
+        BST = Delete(BST, X);
+    }
+    printf("Inorder:"); InorderTraversal(BST); printf("\n");
+
+    return 0;
+}
+BinTree Insert( BinTree BST, ElementType X )
+{
+    BinTree n = (BinTree)malloc(sizeof(struct TNode));
+    n->Data = X;
+    if(BST == NULL)
+    {
+        BST = n;
+        return BST;
+    }
+    BinTree root = BST;
+	while (BST) {
+		if (n->Data > BST->Data) {
+			if (BST->Right)
+				BST = BST->Right;
+			else {
+				BST->Right = n;
+                return root;
+			}
+		}
+		else if (n->Data < BST->Data){
+			if (BST->Left)
+				BST = BST->Left;
+			else {
+				BST->Left = n;
+                return root;
+			}
+		}
+        else
+            return NULL;
+	}
+}
+void swap(ElementType* a, ElementType* b)
+{
+	ElementType tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+BinTree Delete( BinTree BST, ElementType X )
+{
+    BinTree root = BST;
+    BinTree pre = NULL;
+    while (BST) {
+		if (BST->Data < X) {
+            pre = BST;
+			BST = BST->Right;
+		}
+		else if (BST->Data > X) { 
+            pre = BST;
+			BST = BST->Left;
+		}
+		else {
+			if (!BST->Left && !BST->Right) {
+                if(pre){
+                if (pre->Left == BST)
+					pre->Left = NULL;
+				else
+					pre->Right = NULL;
+                }else{
+                    root= NULL;
+                }
+				free(BST);
+				return root;
+			}
+			if (BST->Left && !BST->Right) {
+				swap(&BST->Data,&BST->Left->Data);
+                pre = BST;
+				BST = BST->Left;
+			}
+			else if (!BST->Left && BST->Right){
+				swap(&BST->Data, &BST->Right->Data);
+                pre = BST;
+				BST = BST->Right;
+			}
+			else {
+				BinTree tmp = BST->Left;
+                while(tmp){
+                    if(!tmp->Right)
+                        break;
+                    pre = tmp;
+                    tmp = tmp->Right;
+                }
+				swap(&BST->Data, &tmp->Data);
+				BST = tmp;
+			}
+		}
+	}
+    printf("Not Found\n");
+    return root;
+}
+Position Find( BinTree BST, ElementType X )
+{
+    BinTree n = (BinTree)malloc(sizeof(struct TNode));
+    n->Data = X;
+	while (BST) {
+		if (n->Data > BST->Data) {
+			if (BST->Right)
+				BST = BST->Right;
+			else {
+                free(n);
+				return NULL;
+			}
+		}
+		else if (n->Data < BST->Data){
+			if (BST->Left)
+				BST = BST->Left;
+			else {
+                free(n);
+				return NULL;
+			}
+		}
+        else{
+            free(n);
+            return BST;
+        }
+	}
+    return NULL;
+}
+Position FindMin( BinTree BST )
+{
+    while (BST) {
+		if (!BST->Left)
+			return BST;
+		BST = BST->Left;
+	}
+}
+Position FindMax( BinTree BST )
+{
+     while (BST) {
+		if (!BST->Right)
+			return BST;
+		BST = BST->Right;
+	}
+}
