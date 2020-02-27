@@ -1,0 +1,91 @@
+/*
+运用了堆栈的做法
+时间复杂度 O(N^2)
+/*
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+
+typedef struct TNode{
+	char ch;
+	int high;
+	bool flag;
+	TNode() { ch = 0; flag = 0; high = 0; }
+}TNode;
+
+int if_lNode(vector<TNode>& order, char ch)  //判断是否有左儿子
+{
+	int pos;
+	for (int i = 0; i < order.size(); i++) {
+		if (order[i].ch == ch) {
+			pos = i;
+			order[i].flag = 1;
+			break;
+		}
+	}
+	if (pos != 0)
+		return !order[pos - 1].flag;
+	else
+		return 0;
+}
+int if_rNode(vector<TNode>& order, char ch) //判断是否有右儿子
+{
+	int pos;
+	for (int i = 0; i < order.size(); i++) {
+		if (order[i].ch == ch) {
+			pos = i;
+			order[i].flag = 1;
+			break;
+		}
+	}
+	if (pos != order.size()-1)
+		return !order[pos + 1].flag;
+	else
+		return 0;
+}
+int main()
+{
+	vector<TNode> inOrder;
+	vector<TNode>preOrder;
+	int n;
+	char t;
+	TNode node;
+	cin >> n;
+	for (int i = 0; i < n; i++) {
+		cin >> t;
+		node.ch = t;
+		preOrder.push_back(node);
+	}
+	for (int i = 0; i < n; i++) {
+		cin >> t;
+		node.ch = t;
+		inOrder.push_back(node);
+	}
+	int hightTemp = 0;
+	int hightMax = 0;
+	stack<int> fatherNode;
+	for (int i = 0; i < preOrder.size(); i++) {
+		if(if_rNode(inOrder, preOrder[i].ch))
+			fatherNode.push(i);
+		hightTemp++;
+		preOrder[i].high = hightTemp;
+		if (!if_lNode(inOrder, preOrder[i].ch)) {
+			if (!fatherNode.empty()) {
+				int fpos = fatherNode.top();
+				fatherNode.pop();
+				hightMax = max(hightMax, hightTemp);
+				hightTemp = preOrder[fpos].high;
+			}
+			else {
+				hightMax = max(hightMax, hightTemp);
+			}
+		}
+	}
+	cout << hightMax << endl;
+	return 0;
+}
