@@ -9,6 +9,7 @@
 #include <algorithm>
 using namespace std;
 
+/*左兄右孩树*/
 class tNode;
 typedef tNode* FamilyTree;
 /*
