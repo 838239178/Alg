@@ -1,0 +1,209 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <map>
+#include <set>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+
+class tNode;
+typedef tNode* FamilyTree;
+/*
+插入一个结点
+规则：按照空格数，空格多的是后代放右边，等于的是兄弟放左边。
+		空格少的需要返回特定祖先结点插入。
+返回值：插入结点的指针
+*/
+FamilyTree insert(FamilyTree t,string n,int b);
+/*在整颗二叉树上找名字为s的结点，并返回其指针*/
+FamilyTree findAll(FamilyTree t,string s);
+/*重载1：寻找兄弟（从第一个兄弟开始），返回目标结点指针*/
+FamilyTree findSibling(FamilyTree t, string s);
+/*重载2：寻找兄弟（从头开始），返回最后一个兄弟的结点指针*/
+FamilyTree findSibling(FamilyTree t, string x, string y, int flag);
+/*计算字符串前的空格并删除*/
+int countBlank(string&);
+/*判断陈述语句*/
+bool judge(FamilyTree FT, string x, string y, string cmd);
+
+class tNode
+{
+public:
+	string name;	//名字
+	int blank;		//空格数
+	tNode* left;
+	tNode* right;
+	tNode(string n = 0,int b = 0) { blank = b; name = n; left = right = NULL; }
+};
+
+
+int main()
+{
+	int N, M;
+	cin >> N >> M;
+	cin.get();
+	FamilyTree FT = NULL;
+	string cName;
+	stack<FamilyTree> a;		//存放祖先结点的堆栈
+	for (int i = 0; i < N; i++) {
+		int b = 0;
+		getline(cin, cName);
+		b = countBlank(cName);
+		/*如果遇到空格数比前一个插入的结点少则返回与其空格相等的祖先结点*/
+		if (!a.empty() && b < a.top()->blank) {	
+			while (a.top()->blank > b) {
+				a.pop();
+			}
+			FT = a.top();
+		}
+		FT = insert(FT, cName,b);
+		a.push(FT);
+	}
+	/*获取整个二叉树的头节点*/
+	while (!a.empty()) {
+		FT = a.top();
+		a.pop();
+	}
+	for (int i = 0; i < M; i++) {
+		string x, y, cmd;
+		/*获取关键字*/
+		for (int j = 0; j < 6; j++) {
+			string s;
+			cin >> s;
+			if (j == 0) x = s;
+			else if (j == 3) cmd = s;
+			else if (j == 5) y = s;
+		}
+		/*本质上五个词只有三种类别，可转换*/
+		if (cmd == "parent") {
+			swap(x, y);
+			cmd = "child";
+		}
+		if (cmd == "ancestor") {
+			swap(x, y);
+			cmd = "descendant";
+		}
+		if (judge(FT, x, y, cmd))
+			cout << "True" << endl;
+		else
+			cout << "False" << endl;
+	}
+	return 0;
+}
+/*
+除了找兄弟的情况，其余两种建立在x是y的后代来找
+首先在整个二叉树上找到y，再从y开始找后代
+*/
+bool judge(FamilyTree FT, string x, string y, string cmd)
+{
+	FamilyTree Fy = findAll(FT, y);
+	FamilyTree t = NULL;
+	switch (cmd[0])
+	{
+	case 'c':
+		/*重载1：查看y的孩子结点中是否有x*/
+		t = findSibling(Fy->right, x);
+		break;
+	case 'd':
+		/*查看y这个子二叉树是否有x*/
+		t = findAll(Fy->right, x);
+		break;
+	case 's':
+		/*重载2：在所有节点中判断x,y是否有兄弟关系*/
+		t = findSibling(FT, x, y, 0);
+		break;
+	}		
+	if (t)
+		return 1;
+	else
+		return 0;
+}
+FamilyTree insert(FamilyTree t, string n,int b)
+{
+	FamilyTree newNode = new tNode(n,b);
+	if (!t) {
+		t = newNode;
+		return t;
+	}
+	FamilyTree temp = t;
+	if (temp->blank == newNode->blank) {
+		temp->left = newNode;
+	}
+	else if (temp->blank < newNode->blank) {
+		temp->right = newNode;
+	}
+	return newNode;
+}
+int countBlank(string& s) 
+{
+	int cnt = 0;
+	/*erase清楚s[0]直到非空格*/
+	while(1) {
+		if (s[0] != ' ') break;
+		s.erase(0,1);
+		cnt++;
+	}
+	return cnt;
+}
+FamilyTree findAll(FamilyTree t, string s)
+{
+	if (t) {
+		if (t->name == s)
+			return t;
+		FamilyTree l =	findAll(t->left,s);
+		FamilyTree r =	findAll(t->right,s);
+		/*如果在左边或者右边找到就返回*/
+		if (l) return l;
+		if (r) return r;
+	}
+	return NULL;
+}
+FamilyTree findSibling(FamilyTree t, string s)
+{
+	/*从第一个兄弟开始只需要一直找左边即可*/
+	while (t) {
+		if (t->name == s) break;
+		t = t->left;
+	}
+	return t;
+}
+FamilyTree findSibling(FamilyTree t, string x,string y,int flag)
+{
+	FamilyTree r, l;
+	r = l = NULL;
+	/*
+	第一次找到x或者y时标记一下，后面则只向左边找，如果找到了另一个就返回
+	最后如果返回NULL表示只找到一个或者一个都没有找到
+	*/
+	if (t) {
+		if (flag) {
+			if (t->name == y || t->name == x)
+				return t;
+		}
+		else if (t->name == y || t->name == x)
+			flag = 1;
+		FamilyTree l = findSibling(t->left, x, y, flag);
+		if(flag==0)
+			r = findSibling(t->right, x, y, flag);
+		if (l) return l;
+		if (r) return r;
+	}
+	return NULL;
+}
+
+/*
+测试点 单边倾斜
+4 5
+jobo
+  yyb
+	kkk
+	  jjj
+jjj is a child of kkk
+yyb is an ancestor of jjj
+jobo is a sibling of kkk
+yyb is the parent of jjj
+jobo is a descendant of kkk
+*/
