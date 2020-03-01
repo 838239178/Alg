@@ -1,0 +1,119 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <queue>
+#include <map>
+#include <set>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+
+typedef struct Box
+{
+	int x;
+	int y;
+	int pre;
+	Box() { x = y = -1; pre = -1; }
+	Box(int a, int b, int c) { x = a; y = b; pre = c;}
+}Box;
+
+int mg[1001][1001];
+bool mgpath(int x, int y, int xe, int ye);
+void printRoad(vector<Box>&, Box exit);
+
+
+int main()
+{
+	int n, m;
+	cin >> n >> m;
+	for (int i = 0; i < n + 2; i++) {
+		for (int j = 0; j < m + 2; j++) {
+			//构建四周围墙
+			if (i == 0 || i == n+1)
+				mg[i][j] = 1;
+			else
+			{
+				mg[i][0] = 1;
+				mg[i][m + 1] = 1;
+			}
+			//构建迷宫地图
+			if (i > 0 && i<n+1 && j > 0 && j< m+1) {
+				cin >> mg[i][j];
+			}
+		}
+	}
+	int xe, ye;
+	cin >> xe >> ye;
+	if (!mgpath(1, 1, xe, ye))
+		cout << "Not Found" << endl;
+	return 0;
+}
+void printRoad(vector<Box>& cord, Box exit)
+{
+	vector<Box> road;
+	while (1) {
+		road.push_back(exit);
+		if (exit.pre == -1)
+			break;
+		exit = cord[exit.pre];
+	}
+	reverse(road.begin(), road.end());
+	for (int i = 0; i < road.size(); i++) {
+		cout << "(" << road[i].x << "," << road[i].y << ")" << endl;
+	}
+}
+
+bool mgpath(int x, int y, int xe, int ye)
+{
+	queue<Box> pos;
+	vector<Box> record;
+	Box e(x, y, -1);
+	mg[x][y] = 1;
+	pos.push(e);
+	while (!pos.empty()) {
+		int i, j;
+		e = pos.front();
+		record.push_back(e);
+		j = e.y;
+		i = e.x;
+		pos.pop();
+		if (e.x == xe && e.y == ye) {
+			printRoad(record, e);
+			return true;
+		}
+		int jtemp, itemp;
+		jtemp = e.y;
+		itemp = e.x;
+		for (int di = 0; di < 4; di++) {
+			i = itemp;
+			j = jtemp;
+			switch (di)
+			{
+			default:
+				break;
+			case 0:
+				j = jtemp - 1;
+				break;
+			case 1:
+				i = itemp + 1;
+				break;
+			case 2:
+				j = jtemp + 1;
+				break;
+			case 3:
+				i = itemp - 1;
+				break;
+			}
+			if (mg[j][i] == 0) {
+				e.x = i;
+				e.y = j;
+				e.pre = record.size() - 1;
+				pos.push(e); 
+				mg[e.y][e.x] = -1;
+			}
+		}
+	}
+	return false;
+}
