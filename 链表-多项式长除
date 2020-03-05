@@ -1,0 +1,164 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <queue>
+#include <map>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+
+class PolyNode
+{
+public:
+    int expon;
+    double coef;
+    PolyNode() { expon = coef = 0; }
+};
+typedef struct finder_t
+{
+    int exn;
+    finder_t(int n) : exn(n) { }
+    bool operator()(PolyNode& p)
+    {
+        return exn >= p.expon;
+    }
+
+}finder_t;
+
+list<PolyNode> Add(list<PolyNode>& p1, list<PolyNode>& p2)
+{
+    list<PolyNode> res;
+    list<PolyNode>::iterator it1, it2;
+    it1 = p1.begin();
+    it2 = p2.begin();
+    while (it1 != p1.end() && it2 != p2.end()) {
+        PolyNode newNode;
+        if (it1->expon == it2->expon) {
+            newNode.expon = it1->expon;
+            newNode.coef = it1->coef + it2->coef;
+            if (newNode.coef != 0) res.push_back(newNode);
+            it1++;
+            it2++;
+        }
+        else if (it1->expon > it2->expon) {
+            newNode = *it1;
+            res.push_back(newNode);
+            it1++;
+        }
+        else {
+            newNode = *it2;
+            res.push_back(newNode);
+            it2++;
+        }
+    }
+    while (it1 != p1.end()) {
+        res.push_back(*it1);
+        it1++;
+    }
+    while (it2 != p2.end()) {
+        res.push_back(*it2);
+        it2++;
+    }
+    return res;
+}
+list<PolyNode> Mult(list<PolyNode>& p1, PolyNode p)
+{
+    auto it = p1.begin();
+    list<PolyNode> res;
+    PolyNode tmp;
+    if (p.coef == 0) {
+        res.push_back(tmp);
+        return res;
+    }
+    for (; it != p1.end(); it++) {
+        tmp.coef = it->coef * p.coef;
+        tmp.expon = it->expon + p.expon;
+        res.push_back(tmp);
+    }
+    return res;
+}
+list<PolyNode> Sub(list<PolyNode>& p1, list<PolyNode>& p2)
+{
+    //p1 - p2
+    auto it = p2.begin();
+    list<PolyNode> res;
+    for (; it != p2.end(); it++) {
+        it->coef *= -1;
+    }
+    res = Add(p1, p2);
+    return res;
+}
+list<PolyNode> Dive(list<PolyNode>& p1, list<PolyNode>& p2, list<PolyNode>& Re)
+{
+    //p1 / p2
+    list<PolyNode> res;
+    list<PolyNode> temp; 
+    PolyNode ans;
+    auto it1 = p1.begin();
+    auto it2 = p2.begin();
+    if (p2.empty()) {
+        return res;
+    }
+    while (!p1.empty() && (p1.begin()->coef == 0 || p1.begin()->expon >= p2.begin()->expon))
+    {
+        ans.expon = p1.begin()->expon - p2.begin()->expon;
+        ans.coef = p1.begin()->coef / p2.begin()->coef;
+        res.push_back(ans);
+        temp = Mult(p2,ans);
+        p1 = Sub(p1, temp);
+    }
+    Re = p1;
+    return res;
+}
+list<PolyNode> Read(int n)
+{
+    list<PolyNode> ploy;
+    for (int i = 0; i < n; i++) {
+        PolyNode newNode;
+        cin >> newNode.expon >> newNode.coef;
+        ploy.push_back(newNode);
+    }
+    return ploy;
+}
+void CheckPoly(list<PolyNode>& p)
+{
+    for (auto it = p.begin(); it != p.end();) {
+        double x = it->coef;
+        double correct = (int)(x * 10 + 0.5) / 10.0;
+        if (correct == 0) {
+            p.erase(it);
+            it = p.begin();
+        }
+        else
+            it++;
+    }
+}
+void Print(list<PolyNode>& p)
+{
+    list<PolyNode>::iterator it;   
+    CheckPoly(p);
+    if (p.empty()) {
+        cout << "0 0 0.0" << endl;
+        return;
+    }
+    cout << p.size();
+    for (it = p.begin(); it != p.end(); it++) {
+        cout << " "<<it->expon << " " << fixed << setprecision(1) << it->coef;
+    }  
+    cout << endl;
+}
+int main()
+{ 
+    list<PolyNode> P1, P2, PD, Remainder;
+    int n;
+    cin >> n;
+    P1 = Read(n);    
+    cin >> n;
+    P2 = Read(n);
+    PD = Dive(P1, P2,Remainder);
+    Print(PD);
+    Print(Remainder);
+    return 0;
+}
