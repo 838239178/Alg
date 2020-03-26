@@ -1,0 +1,57 @@
+#include "bits/stdc++.h"
+using namespace std;
+
+int main()
+{
+    stack<int> into;
+    stack<int> mid;
+    stack<int> out;
+    string instr;
+    string outstr;
+    vector<string> cmd;
+    int flag = 0;
+    cin >> instr >> outstr;
+    for (int i = instr.length() - 1; i >= 0; i--) {
+        into.push(instr[i]);
+    }
+    for (int i = outstr.length() - 1; i >= 0; i--) {
+        out.push(outstr[i]);
+    }
+    while (!out.empty()) {
+        if (!into.empty()) {
+            if (into.top() == out.top()) {
+                cmd.push_back("1->2");
+                into.pop();
+                out.pop();
+            }
+            else if (!mid.empty() && out.top() == mid.top()) {
+                cmd.push_back("3->2");
+                mid.pop();
+                out.pop();
+            }
+            else {
+                cmd.push_back("1->3");
+                mid.push(into.top());
+                into.pop();
+            }
+        }
+        else {
+            if (mid.top() != out.top()) {
+                flag = 1;
+                break;
+            }
+            else {
+                cmd.push_back("3->2");
+                mid.pop();
+                out.pop();
+            }
+        }
+    }
+    if (flag)
+        cout << "Are you kidding me?" << endl;
+    else {
+        for (auto s : cmd) {
+            cout << s << endl;
+        }
+    }
+}
