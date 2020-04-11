@@ -1,0 +1,56 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+
+int maxn;
+int visit[11];
+int tsqueue[11];
+int front;
+int endd;
+int fullarragment(int n)
+{
+	int t = 0;
+	for (int i = 1; i <= maxn; i++) {
+		if (!visit[i]) {
+			tsqueue[endd++] = i;
+			visit[i] = 1;
+			if (n == 1) {
+				for (int j = front; j < endd; j++)
+					cout << tsqueue[j];
+				cout << endl;
+				endd--;
+				return i;
+			}
+			t = fullarragment(n - 1);
+			endd--;
+			visit[t] = 0;
+			visit[i] = 0;
+		}
+		
+	}
+}
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+	int n;
+	cin >> n;
+	maxn = n;
+	front = 0;
+	endd = 0;
+	fullarragment(n);
+	return 0;
+}
+/*
+数据 1-9
+最大用时 932ms
+*/
