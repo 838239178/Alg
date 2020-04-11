@@ -1,0 +1,76 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+
+int n;
+vector<int> board(11,-100);
+bool check(int row,int col);
+void result();
+
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+	cin >> n;
+	int row = 0; //行
+	int col = 0; //列
+	/*board[row] = col表示第一行的皇后在col列*/
+	while (row < n) {
+		while (col < n) {
+			if (check(row, col)) {
+				board[row] = col;
+				col = 0;
+				break;
+			}
+			else
+				col++;
+		}
+		if (board[row] == -100) {		//没找到位置
+			if (row == 0)			//找完了全部解
+				break;
+			else {
+				/*回溯到上一行的下一列开始找解*/
+				col = board[--row] + 1;
+				board[row] = -100;
+			}
+		}
+		else if (row == n - 1) {	  //在最后一行找到
+			/*从当前行的下一列继续找解*/
+			result();
+			col = board[row] + 1;
+			board[row] = -100;
+		}
+		else
+			row++;
+	}
+	return 0;
+}
+bool check(int row, int col)
+{
+	for (int i = 0; i < n; i++) {
+		/*判断是否同列或同对角线*/
+		if (board[i] == col || abs(row - i) == abs( col - board[i]))
+			return false;
+	}
+	return true;
+}
+void result()
+{
+	static int cnt = 0;
+	cnt++;
+	cout << cnt << ":";
+	for (int i = 0; i < n; i++) {
+		if (board[i] != -100)
+			cout << " (" << i+1 << "," << board[i]+1 << ")";
+	}
+	cout << endl;
+}
