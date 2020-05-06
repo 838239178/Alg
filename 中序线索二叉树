@@ -1,0 +1,41 @@
+void InThreading(BiThrTree p)// 以结点P为根的子树中序线索化
+{
+
+    if (p)
+    {
+        InThreading(p->lchild);//递归左子树线索化
+        if (p->lchild == NULL)    //没有左孩子
+        {
+            p->LTag = 1;    //前驱线索
+            p->lchild = pre;               //左孩子指针指向前驱
+        }
+        else
+        {
+            p->LTag = 0;
+        }
+        if (pre->rchild == NULL)     //前驱没有右孩子
+        {
+            pre->RTag = 1;      //后继线索
+            pre->rchild = p;                 //前驱右孩子指针指向后继
+        }
+        else
+        {
+            pre->RTag = 0;
+        }
+        pre = p;                                      //保持pre指向p的前驱
+        InThreading(p->rchild);       //递归线索化右子树
+    }
+
+}
+void InOrderTraverse_Thr(BiThrTree T)// 中序遍历二叉线索树T的非递归算法，对每个数据元素直接输出
+{
+    while (T != NULL) {
+        while (T->LTag == 0) T = T->lchild;
+        std::cout << T->data;
+        while (T->RTag == 1 && T->rchild->rchild != NULL) {
+            T = T->rchild;
+            std::cout << T->data;
+        }
+        T = T->rchild;
+    }
+}
