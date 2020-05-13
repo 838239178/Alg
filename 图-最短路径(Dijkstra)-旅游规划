@@ -1,0 +1,86 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+const int inf = 1e5;
+/*自定义权值类*/
+class node
+{
+public:
+	int dist;
+	int cost;
+	node() { dist = cost = inf; }
+	node(int a, int b) { dist = a, cost = b; }
+	bool operator < (const node b) {
+		if (b.dist == dist)
+			return cost < b.cost;
+		else
+			return dist < b.dist;
+	}
+	bool operator > (const node b) {
+		return !(*this < b);
+	}
+	node operator + (const node b) {
+		node res;
+		res.dist = dist + b.dist;
+		res.cost = cost + b.cost;
+		return res;
+	}
+};
+node mg[501][501];
+/*
+s: 原点
+d: 目的地
+n: 顶点数
+*/
+void Dijkstra(int s, int d, int n)
+{
+	vector<bool> collected(n, false);
+	vector<node> dist(n);				//记录s->任意顶点的最短距离		
+	for (int i = 0; i < n; i++)
+		dist[i] = mg[s][i];				//初始化（未连接的顶点最短距离为+∞）
+	int v;								//与s最近且还没算过的顶点
+	dist[s] = node{ 0,0 };
+	while (1) {
+		//找出v
+		node minn;
+		for (int j = 0; j < n; j++) {
+			if (!collected[j] && dist[j] < minn) {
+				v = j;
+				minn = dist[j];
+			}
+		}
+		//判断是否全部找完了
+		if (minn.dist == inf) break;
+		collected[v] = true;
+		//计算v的每个连接点到s的最短距离
+		for (int w = 0; w < n; w++) {
+			if (!collected[w] && mg[v][w].dist != inf) {
+				//如果s->w走s->v->w这条路更短的话就更新最短距离
+				if (dist[w] > dist[v] + mg[v][w]) {
+					dist[w] = dist[v] + mg[v][w];
+				}
+			}
+		}
+	}
+	cout << dist[d].dist << " " << dist[d].cost;
+}
+int main()
+{
+	int N, M, S, D;
+	cin >> N >> M >> S >> D;
+	int x, y;
+	for (int i = 0; i < M; i++) {
+		cin >> x >> y;
+		cin>> mg[x][y].dist >> mg[x][y].cost;
+		mg[y][x] = mg[x][y];
+	}
+	Dijkstra(S, D, N);
+}
