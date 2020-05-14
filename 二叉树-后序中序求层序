@@ -1,0 +1,63 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+const int inf = 1e9;
+
+vector<int> postOrder, inOrder;
+
+typedef struct node
+{
+	node* left;
+	node* right;
+	int data;
+	node() { left = right = NULL; }
+}Tnode;
+
+Tnode* CreateTree(int pLeft, int pRight, int iLeft, int iRight)
+{
+	Tnode* t = new Tnode;
+	t->data = postOrder[pRight];
+	int Lnum = 0;
+	int Rnum = 0;
+	for (int i = iLeft; inOrder[i] != postOrder[pRight]; Lnum++,i++);
+	Rnum = pRight - pLeft - Lnum;
+	if(Lnum>0)t->left = CreateTree(pLeft, pLeft + Lnum - 1,iLeft, iLeft + Lnum -1);
+	if(Rnum>0)t->right = CreateTree(pLeft + Lnum, pRight - 1, iLeft + Lnum + 1, iRight);
+	return t;
+}
+void LevelOrederPrint(Tnode* t)
+{
+	queue<Tnode*> q;
+	q.push(t);
+	while (!q.empty()) {
+		t = q.front();
+		q.pop();
+		cout << t->data << " ";
+		if (t->left) q.push(t->left);
+		if (t->right) q.push(t->right);
+	}
+}
+int main()
+{
+	int n;
+	cin >> n;
+	int num;
+	for (int i = 0; i < n; i++) {
+		cin >> num;
+		postOrder.push_back(num);
+	}
+	for (int i = 0; i < n; i++) {
+		cin >> num;
+		inOrder.push_back(num);
+	}
+	Tnode* t = CreateTree(0, n-1, 0, n-1);
+	LevelOrederPrint(t);
+}
