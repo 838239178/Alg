@@ -1,0 +1,112 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+const int INF = 1e9;
+int mg[500][500];
+int rescue[500];
+void Dijkstra(int entry, int exit, int n);
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+	int N, M, S, D;
+	cin >> N >> M >> S >> D;
+	for (int i = 0; i < N; i++) {
+		cin >> rescue[i];
+	}
+	int a,b,c;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			mg[i][j] = INF;
+		}
+	}
+	for (int i = 0; i < M; i++) {
+		cin >> a >> b >> c;
+		mg[a][b] = mg[b][a] = c;
+	}
+	Dijkstra(S, D, N);
+	return 0;
+}
+class node
+{
+public:
+	int dis;
+	int manNum;
+	node(int a = INF, int b = 0):dis(a),manNum(b){}
+	bool operator < (const node & a) {
+		if (dis == a.dis)
+			return manNum > a.manNum;
+		else
+			return dis < a.dis;
+	}
+	bool operator > (const node& a) {
+		return !(*this < a);
+	}
+	node operator + (const node& a) {
+		return node{ dis + a.dis, manNum + a.manNum };
+	}
+};
+void Dijkstra(int entry, int exit, int n)
+{
+
+	vector<node> dist(n);
+	vector<int> pathchoice(n, 0);
+	vector<int> path(n,-1);
+	vector<bool> visted(n);
+	for (int i = 0; i < n; i++) {
+		dist[i].dis = mg[entry][i];
+		dist[i].manNum = rescue[i]+rescue[entry];
+	}
+	dist[entry].dis = 0;
+	dist[entry].manNum = rescue[entry];
+	pathchoice[entry] = 1;
+	int v;
+	while (1) {
+		node minn;
+		for (int i = 0; i < n; i++) {
+			if (!visted[i] && dist[i] < minn) {
+				v = i;
+				minn = dist[i];
+			}
+		}
+		if (v == exit || minn.dis == INF) break;
+		visted[v] = true;
+		for (int w = 0; w < n; w++) {
+			if (!visted[w] && mg[v][w] != INF) {
+				node temp = node{ mg[v][w],rescue[w] };				
+				if (dist[w].dis == temp.dis + dist[v].dis)
+					pathchoice[w] += pathchoice[v];
+				if (dist[w] > dist[v] + temp) {
+					dist[w] = dist[v] + temp;
+					path[w] = v;
+					pathchoice[w] = max(pathchoice[w],pathchoice[v]);
+				}				
+			}
+		}
+	}
+	cout << pathchoice[exit] <<" "<< dist[exit].manNum << endl;
+	stack<int> StoD;
+	StoD.push(exit);
+	while (path[exit] != -1) {
+		StoD.push(path[exit]);
+		exit = path[exit];
+	}
+	int cnt = 0;
+	while (!StoD.empty()) {
+		if (cnt == 0)
+			cout << StoD.top();
+		else
+			cout << " " << StoD.top();
+		StoD.pop();
+		cnt++;
+	}
+}
