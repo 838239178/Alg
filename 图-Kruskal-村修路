@@ -1,0 +1,101 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <iomanip>
+#include <algorithm>
+using namespace std;
+#define INF 1e5
+#define MAXSIZE 1001
+
+class node 
+{
+public:
+	int dist;
+	int begin, end;
+	bool operator < (const node& a) {
+		return dist < a.dist;
+	}
+};
+class Set
+{
+	int root[MAXSIZE];
+public:
+	int GetRoot(int c) {
+		if (root[c] < 0)
+			return c;
+		else
+			return root[c] = GetRoot(root[c]);
+	}
+	void Union(int a, int b) {
+		int Ra = GetRoot(a);
+		int Rb = GetRoot(b);
+		if (abs(root[Ra]) > abs(root[Rb])) {
+			root[Ra] += root[Rb];
+			root[Rb] = Ra;
+		}
+		else {
+			root[Rb] += root[Ra];
+			root[Ra] = Rb;
+		}
+	}
+	bool IsSameUnion(int a, int b)	{
+		int Ra = GetRoot(a);
+		int Rb = GetRoot(b);
+		if (Ra == Rb) {
+			if (Ra == -1)
+				return false;
+			else
+				return true;
+		}
+		else
+			return (Ra == b || Rb == a);
+	}
+	void Init(int N) {
+		for (int i = 0; i <= N; i++) {
+			root[i] = -1;
+		}
+	}
+};
+int Kruskal(vector<node>& edge, int N)
+{
+	int cnt = 0;
+	int res = 0;
+	Set s;
+	s.Init(N);
+	sort(edge.begin(), edge.end());
+	for (int i = 0; i < edge.size(); i++) {
+		if (!s.IsSameUnion(edge[i].begin, edge[i].end)) {
+			cnt++;
+			res += edge[i].dist;
+			s.Union(edge[i].begin,edge[i].end);
+		}
+		if (cnt == N - 1)
+			break;
+	}
+	if (cnt != N - 1)
+		return -1;
+	else
+		return res;
+}
+
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+	int N, M;
+	cin >> N >> M;
+	vector<node> edge;
+	node temp;
+	for (int i = 0; i < M; i++) {
+		cin >> temp.begin >> temp.end >> temp.dist;
+		edge.push_back(temp);
+	}
+	cout << Kruskal(edge, N);
+	return 0;
+}
